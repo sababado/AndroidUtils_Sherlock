@@ -421,4 +421,9 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	{
 		onTextChanged(mSearchView.getText().toString());
 	}
+	
+	@Override
+	public boolean isInSearchMode() {
+		return mSearchView.getVisibility() == View.VISIBLE;
+	}
 }
