@@ -231,7 +231,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	{
 		// Make sure the adapter exists
 		ListAdapter adapter = getListView().getAdapter();
-		if (mSearchView.getVisibility() != View.VISIBLE || adapter == null || s == null || s.length() == 0)
+		if (mSearchView.getVisibility() != View.VISIBLE || adapter == null || s == null)
 			return;
 		//if adapter is filterable type then call ontextchanged
 		if(adapter instanceof Filterable)
