@@ -36,8 +36,8 @@ import com.actionbarsherlock.app.SherlockListFragment;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
-import com.sababado.sherlock.app.R;
 import com.sababado.content.SearchableList;
+import com.sababado.sherlock.app.R;
 import com.sababado.utils.UtilDevice;
 import com.sababado.widget.FilterableBaseAdapter;
 
@@ -277,7 +277,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	{
 		try
 		{
-			if (listData.size() > 0 && listData.get(0) != null)
+			if (listData != null && listData.size() > 0 && listData.get(0) != null)
 			{
 				// make sure data is Serializable
 				if (!(listData.get(0) instanceof Serializable))
