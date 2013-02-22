@@ -16,11 +16,13 @@
 
 package com.sababado.app;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.text.Editable;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -82,6 +84,7 @@ import com.sababado.widget.FilterableBaseAdapter;
  */
 public class SearchableSherlockListFragment extends SherlockListFragment implements SearchableList
 {
+	private static final String TAG = "SearchableSherlockListFragment";
 	/**
 	 * The {@link android.widget.EditText EditText} that a user will use to search and filter the
 	 * list.
@@ -115,8 +118,24 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	 * Used only in the case that a custom adapter isn't used.
 	 * This is a "cache" to help loading from state changes.
 	 */
-	private List<?> mListData;
+	private ArrayList<?> mListData;
+	
+	/**
+	 * Used only if there is list data that is saved by onSavedInstanceState
+	 */
+	private ArrayList<?> mSavedListData;
 
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		
+		//check for saved list
+		if(savedInstanceState != null)
+		{
+			mSavedListData =  savedInstanceState.getParcelableArrayList("list");
+		}
+	}
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
@@ -127,6 +146,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
+		Log.v(TAG, "onActivityCreated");
 		super.onActivityCreated(savedInstanceState);
 		
 		//make sure there is an edit text to work with.
@@ -177,6 +197,13 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 		//Save the search view's text and visibility
 		outState.putInt("search_visibility", mSearchView.getVisibility());
 		outState.putString("search_text", mSearchView.getText().toString());
+		//If custom adapter, save state.
+		if(mFilterableAdapter != null)
+		{
+			ArrayList<? extends Parcelable> list = mFilterableAdapter.saveInstanceState();
+			if(list != null)
+				outState.putParcelableArrayList("list", list);
+		}
 	}
 
 	@Override
@@ -222,6 +249,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	 * saved when orientation changes. This method has been overridden to always set false.
 	 */
 	@Override
+	@Deprecated
 	public final void setRetainInstance(boolean retain) {
 		super.setRetainInstance(false);
 	}
@@ -252,7 +280,9 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 		if(!(adapter instanceof Filterable))
 			throw new RuntimeException("The adapter "+adapter.getClass()+" is not of Filterable type.");
 		if(adapter instanceof FilterableBaseAdapter)
+		{
 			mFilterableAdapter = (FilterableBaseAdapter) adapter;
+		}
 		super.setListAdapter(adapter);
 	}
 
@@ -273,15 +303,15 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	}
 
 	@Override
-	public <T> void setListData(List<T> listData)
+	public <T> void setListData(ArrayList<T> listData)
 	{
 		try
 		{
 			if (listData != null && listData.size() > 0 && listData.get(0) != null)
 			{
 				// make sure data is Serializable
-				if (!(listData.get(0) instanceof Serializable))
-					throw new RuntimeException("Exception in Searchable List: List data must be of a Serializable type.");
+				if (!(listData.get(0) instanceof Parcelable))
+					Log.w(TAG, "In order to save list state the list data should be of Parcelable type");
 			}
 			if(mFilterableAdapter != null)
 			{
@@ -298,7 +328,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	}
 
 	@Override
-	public List<?> getListData()
+	public ArrayList<?> getListData()
 	{
 		if(mFilterableAdapter != null)
 			return  mFilterableAdapter.getListData();
@@ -308,7 +338,15 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	}
 	
 	@Override
-	public List<?> getFilteredListData()
+	public ArrayList<?> getSavedListData()
+	{
+		ArrayList<?> data = mSavedListData;
+		mSavedListData = null;
+		return data;
+	}
+	
+	@Override
+	public ArrayList<?> getFilteredListData()
 	{
 		if(mFilterableAdapter == null)
 			throw new RuntimeException("getFilteredListData() can only be used when using a FilterableBaseAdapter");
