@@ -130,8 +130,10 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 		super.onCreate(savedInstanceState);
 		
 		//check for saved list
+		Log.v(TAG, "loading state 1");
 		if(savedInstanceState != null)
 		{
+			Log.v(TAG, "loading state 2");
 			mSavedListData =  savedInstanceState.getParcelableArrayList("list");
 		}
 	}
@@ -198,11 +200,16 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 		outState.putInt("search_visibility", mSearchView.getVisibility());
 		outState.putString("search_text", mSearchView.getText().toString());
 		//If custom adapter, save state.
+		Log.v(TAG, "saving state 1");
 		if(mFilterableAdapter != null)
 		{
+			Log.v(TAG, "saving state 2");
 			ArrayList<? extends Parcelable> list = mFilterableAdapter.saveInstanceState();
 			if(list != null)
+			{
+				Log.v(TAG, "saving state 3");
 				outState.putParcelableArrayList("list", list);
+			}
 		}
 	}
 
@@ -259,7 +266,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	{
 		// Make sure the adapter exists
 		ListAdapter adapter = getListView().getAdapter();
-		if (mSearchView.getVisibility() != View.VISIBLE || adapter == null || s == null)
+		if (adapter == null || s == null)
 			return;
 		//if adapter is filterable type then call ontextchanged
 		if(adapter instanceof Filterable)
@@ -449,7 +456,10 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 			UtilDevice.hideKeyboard(getActivity(), mSearchView);
 			mSearchView.setVisibility(View.GONE);
 			if (clearText)
+			{
 				mSearchView.setText("");
+				forceFilter();
+			}
 			return false;
 		}
 	}
@@ -459,7 +469,10 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 		UtilDevice.hideKeyboard(getActivity(), mSearchView);
 		mSearchView.setVisibility(View.GONE);
 		if (clearText)
+		{
 			mSearchView.setText("");
+			forceFilter();
+		}
 	}
 
 	@Override
