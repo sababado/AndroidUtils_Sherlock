@@ -265,8 +265,8 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	public void onTextChanged(CharSequence s)
 	{
 		// Make sure the adapter exists
-		ListAdapter adapter = getListView().getAdapter();
-		if (adapter == null || s == null)
+		ListAdapter adapter;
+		if (getListView() == null || (adapter=getListView().getAdapter()) == null || s == null)
 			return;
 		//if adapter is filterable type then call ontextchanged
 		if(adapter instanceof Filterable)
@@ -312,6 +312,7 @@ public class SearchableSherlockListFragment extends SherlockListFragment impleme
 	@Override
 	public <T> void setListData(ArrayList<T> listData)
 	{
+		Log.v(TAG, "setListData null? "+(listData == null));
 		try
 		{
 			if (listData != null && listData.size() > 0 && listData.get(0) != null)
